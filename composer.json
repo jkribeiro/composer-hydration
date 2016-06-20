@@ -1,0 +1,10 @@
+{
+    "name": "jkribeiro/composer-hydration",
+    "description": "Provides composer script for project hydration.",
+    "license": "MIT",
+    "autoload": {
+        "classmap": [
+            "src/"
+        ]
+    }
+}
