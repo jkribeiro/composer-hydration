@@ -8,6 +8,7 @@
 namespace Jkribeiro\Composer;
 
 use Composer\Script\Event;
+use Symfony\Component\Finder\Finder;
 
 class ComposerHydrationHandler
 {
@@ -19,7 +20,8 @@ class ComposerHydrationHandler
      */
     public $event;
 
-    public function __construct(Event $event) {
+    public function __construct(Event $event)
+    {
         $this->event = $event;
     }
 
@@ -32,7 +34,8 @@ class ComposerHydrationHandler
      * @return boolean
      *   Returns TRUE in case of success, FALSE otherwise.
      */
-    public function cmdArgumentExist($argument_name) {
+    public function cmdArgumentExist($argument_name)
+    {
         return in_array($argument_name, [self::REPLACE_ARG, self::REPLACE_FILE_ARG]);
     }
 
@@ -45,7 +48,8 @@ class ComposerHydrationHandler
      * @return array
      *   An array, following the format: SEARCH => REPLACE.
      */
-    public function getReplaceValuesFromArgument($arg_values) {
+    public function getReplaceValuesFromArgument($arg_values)
+    {
         $replace_values = [];
 
         $arg_values = explode(',', $arg_values);
@@ -64,7 +68,8 @@ class ComposerHydrationHandler
     /**
      * Returns an array containing the command arguments values.
      */
-    public function getArguments() {
+    public function getArguments()
+    {
         // Checks if script received command arguments.
         $cmd_arguments = $this->event->getArguments();
         if (!$cmd_arguments) {
@@ -97,6 +102,39 @@ class ComposerHydrationHandler
         }
 
         return $return_arguments;
+    }
+
+    public function replaceValues($base_path, $replace_map, $replace_file_name = FALSE)
+    {
+        $io = $this->event->getIO();
+
+        $finder = new Finder();
+        $finder->in($base_path)->exclude('vendor');
+
+        foreach ($replace_map as $search => $replace) {
+            // Restrict files by search.
+            $finder->contains($search);
+        }
+
+        $io->write("[Hydration][INFO] Replacing the content of " . iterator_count($finder) . " files.");
+        foreach ($finder as $file) {
+            $file_path = $file->getRealpath();
+            $io->write("[Hydration][INFO] Reading file: $file_path");
+
+            // Replace values.
+            $file_content = str_replace(array_keys($replace_map), array_values($replace_map), $file->getContents());
+
+            // Save file with new replaced content.
+            $file_saved_bytes = file_put_contents($file_path, $file_content);
+            if (!$file_saved_bytes) {
+                // Failed.
+                throw new \ErrorException("Unable to Hydrate the file, check the file permissions and try again.");
+            }
+
+            // Success.
+            $io->write("[Hydration][OK] File Hydrated.");
+
+        }
     }
 
 }

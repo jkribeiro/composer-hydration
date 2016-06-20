@@ -2,6 +2,9 @@
     "name": "jkribeiro/composer-hydration",
     "description": "Provides composer script for project hydration.",
     "license": "MIT",
+    "require": {
+        "symfony/finder": "~3"
+    },
     "autoload": {
         "classmap": [
             "src/"

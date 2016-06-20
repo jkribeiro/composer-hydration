@@ -21,10 +21,7 @@ class ComposerHydration
 
         $arguments = $handler->getArguments();
 
-
         $base_path = realpath(".");
-
-
-
+        $handler->replaceValues($base_path, $arguments['replace'], $arguments['replace-file']);
     }
 }
