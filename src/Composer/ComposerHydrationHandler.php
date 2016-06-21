@@ -13,16 +13,23 @@ use Symfony\Component\Finder\Finder;
 class ComposerHydrationHandler
 {
     const REPLACE_ARG = '--replace';
-    const REPLACE_FILE_ARG = '--replace-file';
+    const REPLACE_FILE_NAME_ARG = '--replace-file-name';
 
     /**
      * @var \Jkribeiro\Composer\ComposerHydrationHandler\event
      */
     public $event;
 
-    public function __construct(Event $event)
+    /**
+     * @var \Jkribeiro\Composer\ComposerHydrationHandler\basePath
+     */
+    public $basePath;
+
+
+    public function __construct(Event $event, $base_path)
     {
         $this->event = $event;
+        $this->basePath = $base_path;
     }
 
     /**
@@ -36,7 +43,7 @@ class ComposerHydrationHandler
      */
     public function cmdArgumentExist($argument_name)
     {
-        return in_array($argument_name, [self::REPLACE_ARG, self::REPLACE_FILE_ARG]);
+        return in_array($argument_name, [self::REPLACE_ARG, self::REPLACE_FILE_NAME_ARG]);
     }
 
     /**
@@ -94,32 +101,68 @@ class ComposerHydrationHandler
                     throw new \ErrorException('Command argument "--replace" must contain values, like: --replace="{SEARCH}:{REPLACE},.."');
                 }
 
-                $return_arguments['replace'] = $this->getReplaceValuesFromArgument($replace_values);
+                $return_arguments[self::REPLACE_ARG] = $this->getReplaceValuesFromArgument($replace_values);
             }
 
             // Adds 'replace-file' flag to returned arguments.
-            $return_arguments['replace-file'] = $argument == self::REPLACE_FILE_ARG ? TRUE : FALSE;
+            $return_arguments[self::REPLACE_FILE_NAME_ARG] = $argument == self::REPLACE_FILE_NAME_ARG ? TRUE : FALSE;
         }
 
         return $return_arguments;
     }
 
-    public function replaceValues($base_path, $replace_map, $replace_file_name = FALSE)
+    public function hydrateFileContents($replace_map)
     {
         $io = $this->event->getIO();
 
         $finder = new Finder();
-        $finder->in($base_path)->exclude('vendor');
+        $finder->in($this->basePath)->exclude('vendor');
 
         foreach ($replace_map as $search => $replace) {
             // Restrict files by search.
             $finder->contains($search);
         }
 
-        $io->write("[Hydration][INFO] Replacing the content of " . iterator_count($finder) . " files.");
+        $io->write("[Hydration][INFO] Hydrating " . iterator_count($finder) . " files.");
+
         foreach ($finder as $file) {
             $file_path = $file->getRealpath();
-            $io->write("[Hydration][INFO] Reading file: $file_path");
+
+            // Replace values.
+            $file_content = str_replace(array_keys($replace_map), array_values($replace_map), $file->getContents());
+
+            // Save file with new replaced content.
+            $file_saved_bytes = file_put_contents($file_path, $file_content);
+            if (!$file_saved_bytes) {
+                // Failed.
+                throw new \ErrorException("Unable to Hydrate the file, check the file permissions and try again: $file_path");
+            }
+
+            // Success.
+            $io->write("[Hydration][OK] File Hydrated: $file_path");
+        }
+    }
+
+    public function hydrateFileNames($replace_map)
+    {
+        $io = $this->event->getIO();
+
+        $finder = new Finder();
+        $finder->in($this->basePath)->exclude('vendor');
+
+        foreach ($replace_map as $search => $replace) {
+            // Restrict files by search.
+            $finder->name("*$search*");
+        }
+
+        $io->write("[Hydration][INFO] Hydrating " . iterator_count($finder) . " files.");
+
+        foreach ($finder as $file) {
+            $file_path = $file->getRealpath();
+            $file_name = $file->getRelativePathname();
+
+            print_r($file_name);
+
 
             // Replace values.
             $file_content = str_replace(array_keys($replace_map), array_values($replace_map), $file->getContents());
@@ -132,9 +175,24 @@ class ComposerHydrationHandler
             }
 
             // Success.
-            $io->write("[Hydration][OK] File Hydrated.");
-
+            $io->write("[Hydration][OK] File Hydrated: $file_path");
         }
+    }
+
+    public function hydrate()
+    {
+        $arguments = $this->getArguments();
+        $replace_map = $arguments[self::REPLACE_ARG];
+
+        $replace_file_name = $arguments[self::REPLACE_FILE_NAME_ARG];
+        if ($replace_file_name) {
+            // Hydrate files content.
+            $this->hydrateFileNames($replace_map);
+        }
+
+        // Hydrate files content.
+        // $this->hydrateFileContents($replace_map);
+
     }
 
 }

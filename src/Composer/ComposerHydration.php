@@ -17,11 +17,9 @@ class ComposerHydration
      */
     public static function meatOnBones(Event $event)
     {
-        $handler = new ComposerHydrationHandler($event);
-
-        $arguments = $handler->getArguments();
-
         $base_path = realpath(".");
-        $handler->replaceValues($base_path, $arguments['replace'], $arguments['replace-file']);
+        $handler = new ComposerHydrationHandler($event, $base_path);
+
+        $handler->hydrate();
     }
 }
