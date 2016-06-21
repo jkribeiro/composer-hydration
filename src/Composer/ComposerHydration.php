@@ -13,12 +13,12 @@ use Jkribeiro\Composer\ComposerHydrationHandler;
 class ComposerHydration
 {
     /**
-     * TODO Add doc.
+     * Composer callback method for Hydration process.
      */
     public static function meatOnBones(Event $event)
     {
-        $base_path = realpath(".");
-        $handler = new ComposerHydrationHandler($event, $base_path);
+        $basePath = realpath(".");
+        $handler = new ComposerHydrationHandler($event, $basePath);
 
         $handler->hydrate();
     }
