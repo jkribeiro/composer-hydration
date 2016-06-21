@@ -1,7 +1,14 @@
 {
     "name": "jkribeiro/composer-hydration",
-    "description": "Provides composer script for project hydration.",
+    "description": "Provides a composer script for hydrate project.",
+    "keywords": ["hydrate", "placeholder", "replace", "wildcard", "scaffold"],
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Jean Kemparski Ribeiro",
+            "email": "jean.k.ribeiro@gmail.com",
+        },
+    ],
     "require": {
         "symfony/finder": "~3"
     },

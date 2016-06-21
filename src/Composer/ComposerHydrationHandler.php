@@ -27,7 +27,15 @@ class ComposerHydrationHandler
      */
     public $basePath;
 
-
+    /**
+     * Class ComposerHydrationHandler Constructor.
+     *
+     * @param object $event
+     *   Composer Event object.
+     *
+     * @param string $basePath
+     *   Path where the hydration will be performed.
+     */
     public function __construct(Event $event, $basePath)
     {
         $this->event = $event;
@@ -45,7 +53,7 @@ class ComposerHydrationHandler
      */
     public function cmdArgumentExist($argumentName)
     {
-        return in_array($argumentName, [self::REPLACE_ARG]);
+        return in_array($argumentName, array(self::REPLACE_ARG));
     }
 
     /**
@@ -59,7 +67,7 @@ class ComposerHydrationHandler
      */
     public function getReplaceValuesFromArgument($argValues)
     {
-        $replaceValues = [];
+        $replaceValues = array();
 
         $argValues = explode(',', $argValues);
         foreach ($argValues as $argValue) {
@@ -76,6 +84,9 @@ class ComposerHydrationHandler
 
     /**
      * Returns an array containing the command arguments values.
+     *
+     * @return array
+     *   An array containing the script command arguments.
      */
     public function getArguments()
     {
@@ -86,7 +97,7 @@ class ComposerHydrationHandler
         }
 
         // Treats arguments.
-        $returnArguments = [];
+        $returnArguments = array();
         foreach ($cmdArguments as $cmdArgument) {
             $cmdArgument = explode('=', $cmdArgument);
             $argument = $cmdArgument[0];
@@ -98,7 +109,7 @@ class ComposerHydrationHandler
 
             // Treats REPLACE_ARG argument.
             if ($argument == self::REPLACE_ARG) {
-                $replaceValues = !empty($cmdArgument[1]) ? $cmdArgument[1] : NULL;
+                $replaceValues = !empty($cmdArgument[1]) ? $cmdArgument[1] : null;
                 if (!$replaceValues) {
                     throw new \ErrorException('Command argument "--replace" must contain values, like: --replace="{SEARCH}:{REPLACE},.."');
                 }
@@ -135,6 +146,7 @@ class ComposerHydrationHandler
         $count = iterator_count($finder);
         if (!$count) {
             $io->write("[Hydration][OK] Skipping, no file contents to be replaced.");
+
             return;
         }
 
@@ -181,12 +193,13 @@ class ComposerHydrationHandler
         $count = iterator_count($finder);
         if (!$count) {
             $io->write("[Hydration][OK] Skipping, no folders and files to be renamed.");
+
             return;
         }
 
         $io->write("[Hydration][INFO] Renaming $count file(s)/folder(s).");
 
-        $finder = array_keys(iterator_to_array($finder, TRUE));
+        $finder = array_keys(iterator_to_array($finder, true));
         foreach ($finder as $currentName) {
             $newName = str_replace(array_keys($replaceMap), array_values($replaceMap), $currentName);
 
