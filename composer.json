@@ -6,11 +6,11 @@
     "authors": [
         {
             "name": "Jean Kemparski Ribeiro",
-            "email": "jean.k.ribeiro@gmail.com",
-        },
+            "email": "jean.k.ribeiro@gmail.com"
+        }
     ],
     "require": {
-        "symfony/finder": "~3"
+        "symfony/finder": "~2.8"
     },
     "autoload": {
         "classmap": [
