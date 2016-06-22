@@ -135,7 +135,7 @@ class ComposerHydrationHandler
         $io = $this->event->getIO();
 
         $finder = new Finder();
-        $finder->in($this->basePath)->exclude('vendor');
+        $finder->in($this->basePath)->notPath('vendor')->notName('composer.json');;
 
         // Find files.
         foreach ($replaceMap as $search => $replace) {
