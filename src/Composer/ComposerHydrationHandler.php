@@ -16,6 +16,7 @@ use Symfony\Component\Finder\Finder;
 class ComposerHydrationHandler
 {
     const REPLACE_ARG = '--replace';
+    const MAGIC_VAR_BASENAME = '{%BASENAME%}';
 
     /**
      * @var Event Object
@@ -57,6 +58,47 @@ class ComposerHydrationHandler
     }
 
     /**
+     * Returns all magic variables available.
+     *
+     * @return array
+     *   Returns an array containing all magic variables available.
+     */
+    public function getMagicVariables()
+    {
+        return array(
+            self::MAGIC_VAR_BASENAME,
+        );
+    }
+
+    /**
+     * Checks if the given replace value is a magic variable.
+     *
+     * @return bool
+     *   Returns TRUE in case of success, FALSE otherwise.
+     */
+    public function isMagicVariable($replace_value)
+    {
+        return in_array($replace_value, $this->getMagicVariables());
+    }
+
+    /**
+     * Returns the magic value of a magic variable.
+     *
+     * @return string
+     *   The magic value.
+     */
+    public function getMagicVariableValue($variable)
+    {
+        switch ($variable) {
+            case self::MAGIC_VAR_BASENAME:
+                return basename(realpath("."));
+                break;
+        }
+
+        return NULL;
+    }
+
+    /**
      * Returns an array containing the replace values from command argument.
      *
      * @param string $argValues
@@ -76,7 +118,14 @@ class ComposerHydrationHandler
                 throw new \ErrorException('Command argument "--replace" must follow the format: --replace="{SEARCH}:{REPLACE},..."');
             }
 
-            $replaceValues[trim($argValue[0])] = trim($argValue[1]);
+            $search = trim($argValue[0]);
+            $replace = trim($argValue[1]);
+            if ($this->isMagicVariable($replace)) {
+                // Is magic variable, so, replace by the magic value.
+                $replace = $this->getMagicVariableValue($replace);
+            }
+
+            $replaceValues[$search] = $replace;
         }
 
         return $replaceValues;
