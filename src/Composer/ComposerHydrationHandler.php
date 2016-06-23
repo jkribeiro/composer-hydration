@@ -95,7 +95,7 @@ class ComposerHydrationHandler
                 break;
         }
 
-        return NULL;
+        return null;
     }
 
     /**
@@ -115,7 +115,8 @@ class ComposerHydrationHandler
         foreach ($argValues as $argValue) {
             $argValue = explode(':', $argValue);
             if (count($argValue) != 2) {
-                throw new \ErrorException('Command argument "--replace" must follow the format: --replace="{SEARCH}:{REPLACE},..."');
+                $msg = 'Command argument "--replace" must follow the format: --replace="{SEARCH}:{REPLACE},..."';
+                throw new \ErrorException($msg);
             }
 
             $search = trim($argValue[0]);
@@ -160,7 +161,8 @@ class ComposerHydrationHandler
             if ($argument == self::REPLACE_ARG) {
                 $replaceValues = !empty($cmdArgument[1]) ? $cmdArgument[1] : null;
                 if (!$replaceValues) {
-                    throw new \ErrorException('Command argument "--replace" must contain values, like: --replace="{SEARCH}:{REPLACE},.."');
+                    $msg = 'Command argument "--replace" must contain values, like: --replace="{SEARCH}:{REPLACE},.."';
+                    throw new \ErrorException($msg);
                 }
 
                 $returnArguments[self::REPLACE_ARG] = $this->getReplaceValuesFromArgument($replaceValues);
@@ -184,7 +186,7 @@ class ComposerHydrationHandler
         $io = $this->event->getIO();
 
         $finder = new Finder();
-        $finder->in($this->basePath)->notPath('vendor')->notName('composer.json');;
+        $finder->in($this->basePath)->notPath('vendor')->notName('composer.json');
 
         // Find files.
         foreach ($replaceMap as $search => $replace) {
@@ -210,7 +212,8 @@ class ComposerHydrationHandler
             // Save file with new replaced content.
             if (!file_put_contents($filePath, $fileContent)) {
                 // Failed.
-                throw new \ErrorException("Unable to Hydrate the file, check the file permissions and try again: $filePath");
+                $msg = "Unable to Hydrate the file, check the file permissions and try again: $filePath";
+                throw new \ErrorException($msg);
             }
 
             // Success.
@@ -278,5 +281,4 @@ class ComposerHydrationHandler
         // Hydrate file contents.
         $this->hydrateFileContents($replaceMap);
     }
-
 }
