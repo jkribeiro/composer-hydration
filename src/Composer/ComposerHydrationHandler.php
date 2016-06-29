@@ -17,6 +17,7 @@ class ComposerHydrationHandler
 {
     const REPLACE_ARG = '--replace';
     const MAGIC_VAR_BASENAME = '{%BASENAME%}';
+    const MAGIC_VAR_UCFIRST_BASENAME = '{%UCFIRST_BASENAME%}';
 
     /**
      * @var Event Object
@@ -67,6 +68,7 @@ class ComposerHydrationHandler
     {
         return array(
             self::MAGIC_VAR_BASENAME,
+            self::MAGIC_VAR_UCFIRST_BASENAME,
         );
     }
 
@@ -92,6 +94,10 @@ class ComposerHydrationHandler
         switch ($variable) {
             case self::MAGIC_VAR_BASENAME:
                 return basename(realpath("."));
+                break;
+
+            case self::MAGIC_VAR_UCFIRST_BASENAME:
+                return ucfirst(basename(realpath(".")));
                 break;
         }
 
