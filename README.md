@@ -102,6 +102,7 @@ $ composer install
 Using the same idea of [PHP Magic constants](http://php.net/manual/en/language.constants.predefined.php), __composer-hydration__ provides some Magic constants too.
 
 - `{%BASENAME%}`: Returns the base folder name where the script is being executed, normally is the name of the project.
+- `{%UCFIRST_BASENAME%}`: Returns the base folder name with the first character capitalized.
 
   Example:
 
