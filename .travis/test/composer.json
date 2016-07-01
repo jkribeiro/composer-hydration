@@ -1,0 +1,27 @@
+{
+    "config": {
+        "vendor-dir": "/tmp/travis/vendor"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../../"
+        }
+    ],
+    "require": {
+        "jkribeiro/composer-hydration": "*"
+    },
+    "minimum-stability": "dev",
+    "scripts": {
+        "hydrate": "Jkribeiro\\Composer\\ComposerHydration::meatOnBones",
+        "run-travis-test": [
+            "@composer run-script hydrate -- --replace={{FOLDER}}:replacedfolder",
+            "@composer run-script hydrate -- --replace={{FILE}}:replacedfile",
+            "@composer run-script hydrate -- --replace={{STRING}}:replacedstring",
+            "@composer run-script hydrate -- --replace={{BASENAME}}:{%BASENAME%}",
+            "@composer run-script hydrate -- --replace={{UCFIRST_BASENAME}}:{%UCFIRST_BASENAME%}",
+            "chmod 775 ./travis_script.sh",
+            "./travis_script.sh"
+        ]
+    }
+}

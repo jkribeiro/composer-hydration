@@ -1,0 +1,3 @@
+{{STRING}} looks correct!
+Executed on project folder {{BASENAME}}
+Project folder UCFIRST {{UCFIRST_BASENAME}}
