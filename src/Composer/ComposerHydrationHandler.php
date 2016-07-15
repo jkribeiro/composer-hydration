@@ -192,7 +192,10 @@ class ComposerHydrationHandler
         $io = $this->event->getIO();
 
         $finder = new Finder();
-        $finder->in($this->basePath)->notPath('vendor')->notName('composer.json');
+        $finder->in($this->basePath);
+        $finder->ignoreDotFiles(false);
+        $finder->notPath('vendor');
+        $finder->notName('composer.json');
 
         // Find files.
         foreach ($replaceMap as $search => $replace) {
@@ -241,10 +244,13 @@ class ComposerHydrationHandler
         $io = $this->event->getIO();
 
         $finder = new Finder();
-        $finder->in($this->basePath)->exclude('vendor');
+        $finder->in($this->basePath);
+        $finder->ignoreDotFiles(false);
+        $finder->exclude('vendor');
 
         foreach ($replaceMap as $search => $replace) {
             // Restrict files by search.
+            $finder->name(".*$search*");
             $finder->name("*$search*");
         }
 

@@ -26,12 +26,34 @@ else
   export BUILD_RESULT=1
 fi
 
+# Check by FOLDER Hidden replacement.
+export HIDDEN_FOLDER_NAME_HYDRATED=".replacedfolder_hidden"
+if [ -d "$HIDDEN_FOLDER_NAME_HYDRATED" ]; then
+  echo "$MSG_OK Hidden Folder Hydrated: '$HIDDEN_FOLDER_NAME_HYDRATED'"
+else
+  echo "$MSG_ERROR Unable to rename a Hidden Folder: '$HIDDEN_FOLDER_NAME_HYDRATED'"
+
+  # Failing build.
+  export BUILD_RESULT=1
+fi
+
 # Check by FILE replacement.
 export FILE_NAME_HYDRATED="replacedfile"
 if [[ ! -n $( find -L . -name "${FILE_NAME_HYDRATED}" ) ]]; then
   echo "$MSG_OK File Hydrated: '$FILE_NAME_HYDRATED.txt'"
 else
   echo "$MSG_ERROR Unable to rename a File: '$FILE_NAME_HYDRATED.txt'"
+
+  # Failing build.
+  export BUILD_RESULT=1
+fi
+
+# Check by Hidden FILE replacement.
+export HIDDEN_FILE_NAME_HYDRATED=".replacedfile"
+if [[ ! -n $( find -L . -name "${HIDDEN_FILE_NAME_HYDRATED}" ) ]]; then
+  echo "$MSG_OK Hidden File Hydrated: '$HIDDEN_FILE_NAME_HYDRATED.txt'"
+else
+  echo "$MSG_ERROR Unable to rename a Hidden File: '$HIDDEN_FILE_NAME_HYDRATED.txt'"
 
   # Failing build.
   export BUILD_RESULT=1
@@ -44,6 +66,16 @@ if grep -q "$STRING_HYDRATED" "$FOLDER_NAME_HYDRATED" -r; then
   echo "$MSG_OK String Hydrated: '$STRING_HYDRATED'"
 else
   echo "$MSG_ERROR Unable to replace content on file.: '$STRING_HYDRATED'"
+
+  # Failing build.
+  export BUILD_RESULT=1
+fi
+
+# Check by STRING replacement in a hidden file.
+if grep -q "$STRING_HYDRATED" "$HIDDEN_FOLDER_NAME_HYDRATED" -r; then
+  echo "$MSG_OK String Hydrated in a hidden file: '$STRING_HYDRATED'"
+else
+  echo "$MSG_ERROR Unable to replace content on a hidden file.: '$STRING_HYDRATED'"
 
   # Failing build.
   export BUILD_RESULT=1
