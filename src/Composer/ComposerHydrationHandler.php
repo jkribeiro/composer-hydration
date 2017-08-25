@@ -18,6 +18,8 @@ class ComposerHydrationHandler
     const REPLACE_ARG = '--replace';
     const MAGIC_VAR_BASENAME = '{%BASENAME%}';
     const MAGIC_VAR_UCFIRST_BASENAME = '{%UCFIRST_BASENAME%}';
+    const MAGIC_VAR_UPPER_CAMEL_CASE_BASENAME = '{%UPPER_CAMEL_CASE_BASENAME%}';
+    const MAGIC_VAR_LOWER_CAMEL_CASE_BASENAME = '{%LOWER_CAMEL_CASE_BASENAME%}';
 
     /**
      * @var Event Object
@@ -69,6 +71,8 @@ class ComposerHydrationHandler
         return array(
             self::MAGIC_VAR_BASENAME,
             self::MAGIC_VAR_UCFIRST_BASENAME,
+            self::MAGIC_VAR_UPPER_CAMEL_CASE_BASENAME,
+            self::MAGIC_VAR_LOWER_CAMEL_CASE_BASENAME,
         );
     }
 
@@ -83,6 +87,40 @@ class ComposerHydrationHandler
         return in_array($replace_value, $this->getMagicVariables());
     }
 
+  /**
+   * Converts a string to upper camel case.
+   *
+   * @param string $string
+   *   The string to be converted.
+   *
+   * @return string
+   *   An upper camel case string.
+   */
+  public function toUpperCamelCase($string)
+  {
+      $string = str_replace(array('-', '_'), ' ', $string);
+      $string = ucwords(strtolower($string));
+      $string = str_replace(' ', '', $string);
+
+      return $string;
+  }
+
+   /**
+    * Converts a string to lower camel case.
+    *
+    * @param string $string
+    *   The string to be converted.
+    *
+    * @return string
+    *   A lower camel case string.
+    */
+    public function toLowerCamelCase($string)
+    {
+        $string = $this->toUpperCamelCase($string);
+
+        return lcfirst($string);
+    }
+
     /**
      * Returns the magic value of a magic variable.
      *
@@ -91,13 +129,23 @@ class ComposerHydrationHandler
      */
     public function getMagicVariableValue($variable)
     {
+        $base_path_name = basename(realpath("."));
+
         switch ($variable) {
             case self::MAGIC_VAR_BASENAME:
-                return basename(realpath("."));
+                return $base_path_name;
                 break;
 
             case self::MAGIC_VAR_UCFIRST_BASENAME:
-                return ucfirst(basename(realpath(".")));
+                return ucfirst($base_path_name);
+                break;
+
+            case self::MAGIC_VAR_UPPER_CAMEL_CASE_BASENAME:
+                return $this->toUpperCamelCase($base_path_name);
+                break;
+
+            case self::MAGIC_VAR_LOWER_CAMEL_CASE_BASENAME:
+                return $this->toLowerCamelCase($base_path_name);
                 break;
         }
 

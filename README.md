@@ -104,6 +104,7 @@ Using the same idea of [PHP Magic constants](http://php.net/manual/en/language.c
 
 - `{%BASENAME%}`: Returns the base folder name where the script is being executed, normally is the name of the project.
 - `{%UCFIRST_BASENAME%}`: Returns the base folder name with the first character capitalized.
+- `{%UPPER_CAMEL_CASE_BASENAME%}`, `{%LOWER_CAMEL_CASE_BASENAME%}`: Returns the base folder name using the upper/lower camel case format. Only the folder name separators '-', '_' are allowed.
 
   Example:
 
